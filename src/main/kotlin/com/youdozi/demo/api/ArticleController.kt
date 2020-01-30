@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/article")
 class ArticleController {
-	
+
+	/**
+	 * Get 방식
+	 * return ResponseEntity Map 형태
+	 */
 	@GetMapping
 	fun article(@RequestParam(value="name", defaultValue="") name: String): ResponseEntity<Map<String, Any>>{
 
