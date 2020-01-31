@@ -5,7 +5,7 @@ import com.youdozi.demo.service.ArticleService
 import com.youdozi.demo.util.ResultUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ArticleServiceImpl : ArticleService{
@@ -13,7 +13,7 @@ class ArticleServiceImpl : ArticleService{
     @Autowired
     private lateinit var articleRepository : ArticleRepository
 
-    @Transactional
+    @Transactional(readOnly = true)
     override fun findByName(name: String): Map<String, Any> {
         val article = articleRepository.findByName(name)
 
