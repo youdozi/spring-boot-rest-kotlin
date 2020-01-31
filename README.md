@@ -1,2 +1,2 @@
 # spring-boot-rest-kotlin
-Kotlin Rest API 
+Kotlin Rest API JPA 테스트 
