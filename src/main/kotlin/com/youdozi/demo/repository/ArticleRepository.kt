@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface ArticleRepository : JpaRepository<Article, Int> {
 
-    fun findByName(name : String) : Article
+    fun findByName(name : String) : Article?
 }

@@ -6,11 +6,9 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity
-class Article {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null
-
-    var name: String? = null
-}
+class Article(
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        val id: Int? = null,
+        val name: String? = null
+)
