@@ -1,5 +1,6 @@
 package com.youdozi.demo.api
 
+import com.youdozi.demo.dto.ArticleDto
 import com.youdozi.demo.service.ArticleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -18,6 +19,14 @@ class ArticleController {
 	 * return ResponseEntity Map 형태
 	 */
 	@GetMapping("/{name}")
-	fun article(@PathVariable name: String): ResponseEntity<Map<String, Any>> =
-		ResponseEntity(articleService.findByName(name), HttpStatus.OK)
+	fun findByArticle(@PathVariable name: String): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.findByName(name), HttpStatus.OK)
+
+	@PostMapping
+	fun saveByArticle(@RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.saveByArticle(dto), HttpStatus.OK)
+
+	@DeleteMapping("/{name}")
+	fun deleteByArticle(@PathVariable name: String): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.deleteByArticle(name), HttpStatus.OK)
 }
