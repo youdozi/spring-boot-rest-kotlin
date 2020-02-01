@@ -16,6 +16,10 @@ class ArticleServiceImpl : ArticleService{
     private lateinit var articleRepository : ArticleRepository
 
     @Transactional(readOnly = true)
+    override fun findByAll(): Map<String, Any> =
+        ResultUtil.setCommonResult("S", "성공하였습니다.", articleRepository.findAll())
+
+    @Transactional(readOnly = true)
     override fun findByName(name: String): Map<String, Any> {
 
         // 조회
@@ -29,7 +33,7 @@ class ArticleServiceImpl : ArticleService{
     }
 
     @Transactional
-    override fun saveByArticle(dto: ArticleDto): Map<String, Any> {
+    override fun save(dto: ArticleDto): Map<String, Any> {
 
         // 중복 체크
         val article = dto.name?.let { articleRepository.findByName(it) }
@@ -43,13 +47,30 @@ class ArticleServiceImpl : ArticleService{
     }
 
     @Transactional
-    override fun deleteByArticle(name: String): Map<String, Any> {
+    override fun deleteByName(name: String): Map<String, Any> {
 
         // 조회
         val article = articleRepository.findByName(name)
 
         return if (article != null) {
             articleRepository.delete(article)
+            ResultUtil.setCommonResult("S", "성공하였습니다.")
+        } else {
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
+        }
+    }
+
+    @Transactional
+    override fun updateByName(name: String, dto: ArticleDto): Map<String, Any> {
+
+        // 조회
+        val article = articleRepository.findByName(name)
+
+        return if (article != null){
+
+            // DTO to Entity
+            article.convert(dto)
+            articleRepository.save(article)
             ResultUtil.setCommonResult("S", "성공하였습니다.")
         } else {
             ResultUtil.setCommonResult("E", "데이터가 없습니다.")

@@ -14,19 +14,23 @@ class ArticleController {
 	@Autowired
 	private lateinit var articleService: ArticleService
 
-	/**
-	 * Get 방식
-	 * return ResponseEntity Map 형태
-	 */
+	@GetMapping
+	fun findByAll(): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.findByAll(), HttpStatus.OK)
+
 	@GetMapping("/{name}")
 	fun findByArticle(@PathVariable name: String): ResponseEntity<Map<String, Any>> =
 			ResponseEntity(articleService.findByName(name), HttpStatus.OK)
 
 	@PostMapping
-	fun saveByArticle(@RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
-			ResponseEntity(articleService.saveByArticle(dto), HttpStatus.OK)
+	fun save(@RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.save(dto), HttpStatus.OK)
 
 	@DeleteMapping("/{name}")
-	fun deleteByArticle(@PathVariable name: String): ResponseEntity<Map<String, Any>> =
-			ResponseEntity(articleService.deleteByArticle(name), HttpStatus.OK)
+	fun deleteByName(@PathVariable name: String): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.deleteByName(name), HttpStatus.OK)
+
+	@PutMapping("/{name}")
+	fun updateByName(@PathVariable name: String, @RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
+			ResponseEntity(articleService.updateByName(name, dto), HttpStatus.OK)
 }

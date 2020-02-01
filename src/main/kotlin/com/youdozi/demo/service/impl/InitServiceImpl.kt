@@ -17,10 +17,15 @@ class InitServiceImpl : InitService {
     @PostConstruct
     @Transactional
     override fun init() {
-        articleRepository.save(Article(1, "test1"))
-        articleRepository.save(Article(2, "test2"))
-        articleRepository.save(Article(3, "test3"))
-        articleRepository.save(Article(4, "test4"))
-        articleRepository.save(Article(5, "test5"))
+        articleRepository.save(Article(name = "test1"))
+        articleRepository.save(Article(name = "test2"))
+        articleRepository.save(Article(name = "test3"))
+        articleRepository.save(Article(name = "test4"))
+        articleRepository.save(Article(name = "test5"))
+        articleRepository.save(Article(name = "test6"))
+        articleRepository.save(Article(name = "test7"))
+        articleRepository.save(Article(name = "test8"))
+        articleRepository.save(Article(name = "test9"))
+        articleRepository.save(Article(name = "test10"))
     }
 }
