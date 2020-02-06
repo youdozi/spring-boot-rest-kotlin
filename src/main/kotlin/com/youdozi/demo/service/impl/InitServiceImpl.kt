@@ -17,15 +17,12 @@ class InitServiceImpl : InitService {
     @PostConstruct
     @Transactional
     override fun init() {
-        articleRepository.save(Article(name = "test1"))
-        articleRepository.save(Article(name = "test2"))
-        articleRepository.save(Article(name = "test3"))
-        articleRepository.save(Article(name = "test4"))
-        articleRepository.save(Article(name = "test5"))
-        articleRepository.save(Article(name = "test6"))
-        articleRepository.save(Article(name = "test7"))
-        articleRepository.save(Article(name = "test8"))
-        articleRepository.save(Article(name = "test9"))
-        articleRepository.save(Article(name = "test10"))
+
+        val articleList = ArrayList<Article>()
+
+        for(i in 1..50)
+            articleList.add(Article(name = "test$i"))
+
+        articleRepository.saveAll(articleList)
     }
 }
