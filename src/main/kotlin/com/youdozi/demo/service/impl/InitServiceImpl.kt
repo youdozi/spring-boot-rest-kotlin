@@ -20,7 +20,7 @@ class InitServiceImpl : InitService {
 
         val articleList = ArrayList<Article>()
 
-        for(i in 1..50)
+        for(i in 1..500)
             articleList.add(Article(name = "test$i"))
 
         articleRepository.saveAll(articleList)

@@ -14,7 +14,7 @@ class Article(
         var id: Int? = null,
         var name: String? = null
 
-){
+) : BaseTimeEntity() {
 
     fun convert(obj: ArticleDto) {
         name = obj.name
