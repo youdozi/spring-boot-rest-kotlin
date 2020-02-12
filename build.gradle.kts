@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.youdozi"
-version = "0.0.1-SNAPSHOT"
+version = "dev"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 val developmentOnly by configurations.creating
@@ -46,5 +46,11 @@ tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "1.8"
+	}
+}
+
+jib {
+	to {
+		image = "youdozi/spring-boot-kotlin"
 	}
 }
