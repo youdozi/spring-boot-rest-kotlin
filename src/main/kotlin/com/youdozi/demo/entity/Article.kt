@@ -1,22 +1,32 @@
 package com.youdozi.demo.entity
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.youdozi.demo.dto.ArticleDto
-import java.io.Serializable
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Article(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: Int? = null,
-        var name: String? = null
+        var seq: Long? = null,
 
-) : BaseTimeEntity() {
+        @Column(nullable = false, length = 50)
+        var name: String? = null,
+
+        @Column(nullable = false, length = 200)
+        var content: String? = null,
+
+        @Column(nullable = false, length = 20)
+        var subject: String? = null,
+
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        @Column(nullable = false, length = 200)
+        var password: String? = null
+
+) : BaseEntity() {
 
     fun convert(obj: ArticleDto) {
-        name = obj.name
+        content = obj.content
+        subject = obj.subject
     }
 }

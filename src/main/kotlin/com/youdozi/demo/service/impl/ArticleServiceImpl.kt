@@ -6,9 +6,14 @@ import com.youdozi.demo.repository.ArticleRepository
 import com.youdozi.demo.service.ArticleService
 import com.youdozi.demo.util.ResultUtil
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.annotation.Validated
 
+@Validated
 @Service
 class ArticleServiceImpl : ArticleService{
 
@@ -16,64 +21,64 @@ class ArticleServiceImpl : ArticleService{
     private lateinit var articleRepository : ArticleRepository
 
     @Transactional(readOnly = true)
-    override fun findByAll(): Map<String, Any> =
-        ResultUtil.setCommonResult("S", "성공하였습니다.", articleRepository.findAll())
+    override fun findByAll(pageable : Pageable): ResponseEntity<Map<String, Any>> =
+        ResultUtil.setCommonResult("S", "성공하였습니다.", articleRepository.findAll(pageable), HttpStatus.OK)
 
     @Transactional(readOnly = true)
-    override fun findByName(name: String): Map<String, Any> {
+    override fun findByArticle(seq: Long): ResponseEntity<Map<String, Any>> {
 
         // 조회
-        val article = articleRepository.findByName(name)
+        val article = articleRepository.findById(seq);
 
         return if (article != null) {
-            ResultUtil.setCommonResult("S", "성공하였습니다.", article)
+            ResultUtil.setCommonResult("S", "성공하였습니다.", article, HttpStatus.OK)
         } else {
-            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
         }
     }
 
     @Transactional
-    override fun save(dto: ArticleDto): Map<String, Any> {
+    override fun save(dto: ArticleDto): ResponseEntity<Map<String, Any>> {
 
-        // 중복 체크
-        val article = dto.name?.let { articleRepository.findByName(it) }
+        articleRepository.save(Article(subject = dto.subject, content = dto.content, name = dto.name, password = dto.password));
 
-        return if (article == null){
-            articleRepository.save(Article(name = dto.name))
-            ResultUtil.setCommonResult("S", "성공하였습니다.")
-        } else {
-            ResultUtil.setCommonResult("E", "중복된 데이터가 있습니다.")
-        }
+        return ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
     }
 
     @Transactional
-    override fun deleteByName(name: String): Map<String, Any> {
+    override fun update(seq: Long, dto: ArticleDto): ResponseEntity<Map<String, Any>> {
 
         // 조회
-        val article = articleRepository.findByName(name)
+        val article = articleRepository.findById(seq)
 
-        return if (article != null) {
-            articleRepository.delete(article)
-            ResultUtil.setCommonResult("S", "성공하였습니다.")
-        } else {
-            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
-        }
-    }
+        // TODO 비밀번호 비교 로직 추가
 
-    @Transactional
-    override fun updateByName(name: String, dto: ArticleDto): Map<String, Any> {
-
-        // 조회
-        val article = articleRepository.findByName(name)
-
-        return if (article != null){
+        return if (article.isPresent){
 
             // DTO to Entity
-            article.convert(dto)
-            articleRepository.save(article)
-            ResultUtil.setCommonResult("S", "성공하였습니다.")
+            article.get().convert(dto);
+            articleRepository.save(article.get())
+
+            ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
         } else {
-            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
         }
     }
+
+    @Transactional
+    override fun delete(seq: Long, dto: ArticleDto): ResponseEntity<Map<String, Any>> {
+
+        // 조회
+        val article = articleRepository.findById(seq)
+
+        // TODO 비밀번호 비교 로직 추가
+
+        return if (article.isPresent) {
+            articleRepository.delete(article.get())
+            ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
+        } else {
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
+        }
+    }
+
 }

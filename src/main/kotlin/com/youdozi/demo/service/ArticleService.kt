@@ -1,16 +1,18 @@
 package com.youdozi.demo.service
 
 import com.youdozi.demo.dto.ArticleDto
+import org.springframework.data.domain.Pageable
+import org.springframework.http.ResponseEntity
 
 interface ArticleService {
 
-    fun findByAll(): Map<String, Any>
+    fun findByAll(pageable : Pageable): ResponseEntity<Map<String, Any>>
 
-    fun findByName(name: String): Map<String, Any>
+    fun findByArticle(seq: Long): ResponseEntity<Map<String, Any>>
 
-    fun save(dto: ArticleDto): Map<String, Any>
+    fun save(dto: ArticleDto): ResponseEntity<Map<String, Any>>
 
-    fun deleteByName(name: String): Map<String, Any>
+    fun update(seq: Long, dto: ArticleDto): ResponseEntity<Map<String, Any>>
 
-    fun updateByName(name: String, dto: ArticleDto): Map<String, Any>
+    fun delete(seq: Long, dto: ArticleDto): ResponseEntity<Map<String, Any>>
 }
