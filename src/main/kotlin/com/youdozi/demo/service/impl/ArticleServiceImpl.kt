@@ -4,10 +4,12 @@ import com.youdozi.demo.dto.request.ArticleRequestDto
 import com.youdozi.demo.dto.response.ArticleResponseDto
 import com.youdozi.demo.entity.Article
 import com.youdozi.demo.repository.ArticleRepository
+import com.youdozi.demo.repository.specification.ArticleSpecification
 import com.youdozi.demo.service.ArticleService
 import com.youdozi.demo.util.ResultUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -26,11 +28,14 @@ class ArticleServiceImpl : ArticleService{
     private lateinit var passwordEncoder: PasswordEncoder
 
     @Transactional(readOnly = true)
-    override fun findByAll(pageable : Pageable): ResponseEntity<Map<String, Any>> =
-        ResultUtil.setCommonResult("S", "성공하였습니다.",
-                                    articleRepository.findByUseYn("Y", pageable)
-                                                     .stream()
-                                                     .map {obj -> ArticleResponseDto(obj)}, HttpStatus.OK)
+    override fun findByAll(pageable : Pageable): ResponseEntity<Map<String, Any>> {
+
+        var specifications: Specification<Article>? = Specification.where(ArticleSpecification.useYnEqual("Y"))
+
+        return ResultUtil.setCommonResult("S", "성공하였습니다.",
+                                            articleRepository.findAll(specifications, pageable)
+                                                    .map { obj -> ArticleResponseDto(obj) }, HttpStatus.OK)
+    }
 
     @Transactional(readOnly = true)
     override fun findByArticle(seq: Long): ResponseEntity<Map<String, Any>> {

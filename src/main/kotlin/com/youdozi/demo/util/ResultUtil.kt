@@ -14,34 +14,12 @@ object ResultUtil {
         return ResponseEntity(obj, status)
     }
 
-    // Common Object Result
+    // Common Result
     fun setCommonResult(resultCode: String, resultMessage: String, temp: Any, status: HttpStatus): ResponseEntity<Map<String, Any>> {
         val obj: MutableMap<String, Any> = LinkedHashMap()
-        val detailObj: MutableMap<String, Any> = LinkedHashMap()
         obj["resultCode"] = resultCode
         obj["resultMessage"] = resultMessage
-        detailObj["content"] = temp
-        obj["data"] = detailObj
-        return ResponseEntity(obj, status)
-    }
-
-    // Common List Result
-    fun setCommonResult(resultCode: String, resultMessage: String, temp: List<Any?>, status: HttpStatus): ResponseEntity<Map<String, Any>> {
-        val obj: MutableMap<String, Any> = LinkedHashMap()
-        val detailObj: MutableMap<String, Any> = LinkedHashMap()
-        obj["resultCode"] = resultCode
-        obj["resultMessage"] = resultMessage
-        detailObj["content"] = temp
-        obj["data"] = detailObj
-        return ResponseEntity(obj, status)
-    }
-
-    // Common Result Error
-    fun setCommonResult(resultCode: String, resultMessage: String, errorMessage: String, status: HttpStatus): ResponseEntity<Map<String, Any>> {
-        val obj: MutableMap<String, Any> = LinkedHashMap()
-        obj["resultCode"] = resultCode
-        obj["resultMessage"] = resultMessage
-        obj["errorMessage"] = errorMessage
+        obj["data"] = temp
         return ResponseEntity(obj, status)
     }
 }
