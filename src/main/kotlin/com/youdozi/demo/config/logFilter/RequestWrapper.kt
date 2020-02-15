@@ -42,7 +42,7 @@ class RequestWrapper(request: HttpServletRequest) : HttpServletRequestWrapper(re
 
     @Throws(IOException::class)
     fun convertToObject(): Any? {
-        return if (httpRequestBodyByteArray.size == 0) null else objectMapper.readValue(httpRequestBodyByteArray, Any::class.java)
+        return if (httpRequestBodyByteArray.isEmpty()) null else objectMapper.readValue(httpRequestBodyByteArray, Any::class.java)
     }
 
     init {
