@@ -1,6 +1,7 @@
 package com.youdozi.demo.service.impl
 
-import com.youdozi.demo.dto.ArticleDto
+import com.youdozi.demo.dto.request.ArticleRequestDto
+import com.youdozi.demo.dto.response.ArticleResponseDto
 import com.youdozi.demo.entity.Article
 import com.youdozi.demo.repository.ArticleRepository
 import com.youdozi.demo.service.ArticleService
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
@@ -20,9 +22,15 @@ class ArticleServiceImpl : ArticleService{
     @Autowired
     private lateinit var articleRepository : ArticleRepository
 
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+
     @Transactional(readOnly = true)
     override fun findByAll(pageable : Pageable): ResponseEntity<Map<String, Any>> =
-        ResultUtil.setCommonResult("S", "성공하였습니다.", articleRepository.findAll(pageable), HttpStatus.OK)
+        ResultUtil.setCommonResult("S", "성공하였습니다.",
+                                    articleRepository.findByUseYn("Y", pageable)
+                                                     .stream()
+                                                     .map {obj -> ArticleResponseDto(obj)}, HttpStatus.OK)
 
     @Transactional(readOnly = true)
     override fun findByArticle(seq: Long): ResponseEntity<Map<String, Any>> {
@@ -30,7 +38,7 @@ class ArticleServiceImpl : ArticleService{
         // 조회
         val article = articleRepository.findById(seq);
 
-        return if (article != null) {
+        return if (article.isPresent && article.get().useYn.equals("Y")) {
             ResultUtil.setCommonResult("S", "성공하였습니다.", article, HttpStatus.OK)
         } else {
             ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
@@ -38,25 +46,27 @@ class ArticleServiceImpl : ArticleService{
     }
 
     @Transactional
-    override fun save(dto: ArticleDto): ResponseEntity<Map<String, Any>> {
+    override fun save(requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
 
-        articleRepository.save(Article(subject = dto.subject, content = dto.content, name = dto.name, password = dto.password));
+        articleRepository.save(Article(subject = requestDto.subject, content = requestDto.content, name = requestDto.name, password = passwordEncoder.encode(requestDto.password), useYn = "Y"));
 
         return ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
     }
 
     @Transactional
-    override fun update(seq: Long, dto: ArticleDto): ResponseEntity<Map<String, Any>> {
+    override fun update(seq: Long, requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
 
         // 조회
         val article = articleRepository.findById(seq)
 
-        // TODO 비밀번호 비교 로직 추가
+        return if (article.isPresent && article.get().useYn.equals("Y")) {
 
-        return if (article.isPresent){
+            // 비밀번호 체크
+            if(!passwordEncoder.matches(requestDto.password, article.get().password))
+                return ResultUtil.setCommonResult("E", "패스워드가 맞지 않습니다.", HttpStatus.UNAUTHORIZED)
 
             // DTO to Entity
-            article.get().convert(dto);
+            article.get().convert(requestDto);
             articleRepository.save(article.get())
 
             ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
@@ -66,15 +76,19 @@ class ArticleServiceImpl : ArticleService{
     }
 
     @Transactional
-    override fun delete(seq: Long, dto: ArticleDto): ResponseEntity<Map<String, Any>> {
+    override fun delete(seq: Long, requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
 
         // 조회
         val article = articleRepository.findById(seq)
 
-        // TODO 비밀번호 비교 로직 추가
+        return if (article.isPresent && article.get().useYn.equals("Y")) {
 
-        return if (article.isPresent) {
-            articleRepository.delete(article.get())
+            // 비밀번호 체크
+            if(!passwordEncoder.matches(requestDto.password, article.get().password))
+                return ResultUtil.setCommonResult("E", "패스워드가 맞지 않습니다.", HttpStatus.UNAUTHORIZED)
+
+            article.get().useYn = "N"
+            articleRepository.save(article.get())
             ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
         } else {
             ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)

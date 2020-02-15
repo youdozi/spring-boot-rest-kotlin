@@ -4,6 +4,9 @@ import java.util.*
 
 object PasswordUtil {
 
+    /**
+     * 패스워드 생성기
+     */
     fun passwordGenerate() : String {
         val rnd = Random()
         val buf = StringBuffer()

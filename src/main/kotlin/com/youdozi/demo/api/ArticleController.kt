@@ -1,6 +1,6 @@
 package com.youdozi.demo.api
 
-import com.youdozi.demo.dto.ArticleDto
+import com.youdozi.demo.dto.request.ArticleRequestDto
 import com.youdozi.demo.service.ArticleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+/**
+ * 게시판 API
+ */
 @RestController
 @RequestMapping("/api/article")
 class ArticleController {
@@ -35,20 +38,20 @@ class ArticleController {
      * 게시글 등록
      */
     @PostMapping
-    fun save(@Valid @RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
-            articleService.save(dto)
+    fun save(@Valid @RequestBody requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> =
+            articleService.save(requestDto)
 
     /**
      * 게시글 수정
      */
     @PutMapping("/{seq}")
-    fun update(@PathVariable seq: Long, @Valid @RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
-            articleService.update(seq, dto)
+    fun update(@PathVariable seq: Long, @Valid @RequestBody requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> =
+            articleService.update(seq, requestDto)
 
     /**
      * 게시글 삭제
      */
     @DeleteMapping("/{seq}")
-    fun delete(@PathVariable seq: Long, @Valid @RequestBody dto: ArticleDto): ResponseEntity<Map<String, Any>> =
-            articleService.delete(seq, dto)
+    fun delete(@PathVariable seq: Long, @Valid @RequestBody requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> =
+            articleService.delete(seq, requestDto)
 }
