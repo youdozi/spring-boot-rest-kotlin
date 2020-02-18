@@ -2,6 +2,7 @@ package com.youdozi.demo.config.logFilter
 
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 import java.time.Duration
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse
  * @author youdozi
  */
 @Configuration
+@Component
 class LogFilter : OncePerRequestFilter() {
     private val log = LoggerFactory.getLogger(LogFilter::class.java)
 
@@ -30,17 +32,13 @@ class LogFilter : OncePerRequestFilter() {
 
         val startDate : LocalDateTime = LocalDateTime.now()
 
-        val request: HttpServletRequest = RequestWrapper(req)
-        val response: HttpServletResponse = ResponseWrapper(res)
-        filterChain.doFilter(request, response)
-
         val endDate : LocalDateTime = LocalDateTime.now()
-        var calc = Duration.between(startDate, endDate).seconds
+        var calc = Duration.between(startDate, endDate).nano
 
         log.info("==============================================================================================")
         log.info("요청 종료!!!!! 시작: $startDate 종료: $endDate 응답시간: $calc")
         log.info("==============================================================================================")
 
-        (response as ResponseWrapper).copyBodyToResponse()
+        filterChain.doFilter(req, res)
     }
 }

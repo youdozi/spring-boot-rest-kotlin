@@ -28,8 +28,10 @@ class InitServiceImpl : InitService {
 
         val articleList = ArrayList<Article>()
 
-        for(i in 1..20)
-            articleList.add(Article(subject = "subject$i", content = "content$i", name = "test$i", password = passwordEncoder.encode(PasswordUtil.passwordGenerate()), useYn = "Y"))
+        var password = passwordEncoder.encode(PasswordUtil.passwordGenerate())
+
+        for(i in 1..50)
+            articleList.add(Article(subject = "subject$i", content = "content$i", name = "test$i", password = password, useYn = "Y"))
 
         articleRepository.saveAll(articleList)
     }

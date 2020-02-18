@@ -1,2 +1,3 @@
-# spring-boot-rest-kotlin
-Kotlin Rest API JPA 테스트 
+# 읽어보기
+커뮤니티 게시판 API
+간단한 API 명세를 제공하고 있습니다.

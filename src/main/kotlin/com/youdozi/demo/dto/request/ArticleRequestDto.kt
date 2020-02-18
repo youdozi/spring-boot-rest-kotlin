@@ -19,6 +19,7 @@ class ArticleRequestDto(
 
         @field:NotEmpty(message = "사용자명을 입력해주세요.")
         @field:NotBlank(message = "사용자명을 입력해주세요.")
+        @field:Size(min = 1, max = 20, message = "작성자는 50자 이내로 입력해야합니다.")
         var name: String,
 
         @field:NotEmpty(message = "패스워드를 입력해주세요.")
