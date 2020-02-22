@@ -1,45 +1,25 @@
 package com.youdozi.demo.util
 
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import java.util.*
 
 object ResultUtil {
 
     // Common Result
-    fun setCommonResult(resultCode: String, resultMessage: String): Map<String, Any> {
+    fun setCommonResult(resultCode: String, resultMessage: String, status: HttpStatus): ResponseEntity<Map<String, Any>> {
         val obj: MutableMap<String, Any> = LinkedHashMap()
         obj["resultCode"] = resultCode
         obj["resultMessage"] = resultMessage
-        return obj
+        return ResponseEntity(obj, status)
     }
 
-    // Common Object Result
-    fun setCommonResult(resultCode: String, resultMessage: String, tempObj: Any): Map<String, Any> {
-        val obj: MutableMap<String, Any> = LinkedHashMap()
-        val detailObj: MutableMap<String, Any> = LinkedHashMap()
-        obj["resultCode"] = resultCode
-        obj["resultMessage"] = resultMessage
-        detailObj["content"] = tempObj
-        obj["data"] = detailObj
-        return obj
-    }
-
-    // Common List Result
-    fun setCommonResult(resultCode: String, resultMessage: String, tempList: List<Any?>): Map<String, Any> {
-        val obj: MutableMap<String, Any> = LinkedHashMap()
-        val detailObj: MutableMap<String, Any> = LinkedHashMap()
-        obj["resultCode"] = resultCode
-        obj["resultMessage"] = resultMessage
-        detailObj["content"] = tempList
-        obj["data"] = detailObj
-        return obj
-    }
-
-    // Common Result Error
-    fun setCommonResult(resultCode: String, resultMessage: String, errorMessage: String): Map<String, Any> {
+    // Common Result
+    fun setCommonResult(resultCode: String, resultMessage: String, temp: Any, status: HttpStatus): ResponseEntity<Map<String, Any>> {
         val obj: MutableMap<String, Any> = LinkedHashMap()
         obj["resultCode"] = resultCode
         obj["resultMessage"] = resultMessage
-        obj["errorMessage"] = errorMessage
-        return obj
+        obj["data"] = temp
+        return ResponseEntity(obj, status)
     }
 }

@@ -7,9 +7,12 @@ import java.time.LocalDateTime
 import javax.persistence.EntityListeners
 import javax.persistence.MappedSuperclass
 
+/**
+ * Audit Entity
+ */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseTimeEntity (
+abstract class BaseEntity(
         @CreatedDate
         var createdDate: LocalDateTime? = null,
 

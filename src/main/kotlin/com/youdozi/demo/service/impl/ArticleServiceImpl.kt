@@ -1,79 +1,103 @@
 package com.youdozi.demo.service.impl
 
-import com.youdozi.demo.dto.ArticleDto
+import com.youdozi.demo.dto.request.ArticleRequestDto
+import com.youdozi.demo.dto.response.ArticleResponseDto
 import com.youdozi.demo.entity.Article
 import com.youdozi.demo.repository.ArticleRepository
+import com.youdozi.demo.repository.specification.ArticleSpecification
 import com.youdozi.demo.service.ArticleService
 import com.youdozi.demo.util.ResultUtil
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.annotation.Validated
 
+@Validated
 @Service
 class ArticleServiceImpl : ArticleService{
 
     @Autowired
     private lateinit var articleRepository : ArticleRepository
 
-    @Transactional(readOnly = true)
-    override fun findByAll(): Map<String, Any> =
-        ResultUtil.setCommonResult("S", "성공하였습니다.", articleRepository.findAll())
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
 
     @Transactional(readOnly = true)
-    override fun findByName(name: String): Map<String, Any> {
+    override fun findByAll(pageable : Pageable): ResponseEntity<Map<String, Any>> {
+
+        var specifications: Specification<Article>? = Specification.where(ArticleSpecification.useYnEqual("Y"))
+
+        return ResultUtil.setCommonResult("S", "성공하였습니다.",
+                                            articleRepository.findAll(specifications, pageable)
+                                                    .map { obj -> ArticleResponseDto(obj) }, HttpStatus.OK)
+    }
+
+    @Transactional(readOnly = true)
+    override fun findByArticle(seq: Long): ResponseEntity<Map<String, Any>> {
 
         // 조회
-        val article = articleRepository.findByName(name)
+        val article = articleRepository.findById(seq);
 
-        return if (article != null) {
-            ResultUtil.setCommonResult("S", "성공하였습니다.", article)
+        return if (article.isPresent && article.get().useYn.equals("Y")) {
+            ResultUtil.setCommonResult("S", "성공하였습니다.", article, HttpStatus.OK)
         } else {
-            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
         }
     }
 
     @Transactional
-    override fun save(dto: ArticleDto): Map<String, Any> {
+    override fun save(requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
 
-        // 중복 체크
-        val article = dto.name?.let { articleRepository.findByName(it) }
+        articleRepository.save(Article(subject = requestDto.subject, content = requestDto.content, name = requestDto.name, password = passwordEncoder.encode(requestDto.password), useYn = "Y"));
 
-        return if (article == null){
-            articleRepository.save(Article(name = dto.name))
-            ResultUtil.setCommonResult("S", "성공하였습니다.")
-        } else {
-            ResultUtil.setCommonResult("E", "중복된 데이터가 있습니다.")
-        }
+        return ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
     }
 
     @Transactional
-    override fun deleteByName(name: String): Map<String, Any> {
+    override fun update(seq: Long, requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
 
         // 조회
-        val article = articleRepository.findByName(name)
+        val article = articleRepository.findById(seq)
 
-        return if (article != null) {
-            articleRepository.delete(article)
-            ResultUtil.setCommonResult("S", "성공하였습니다.")
-        } else {
-            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
-        }
-    }
+        return if (article.isPresent && article.get().useYn.equals("Y")) {
 
-    @Transactional
-    override fun updateByName(name: String, dto: ArticleDto): Map<String, Any> {
-
-        // 조회
-        val article = articleRepository.findByName(name)
-
-        return if (article != null){
+            // 비밀번호 체크
+            if(!passwordEncoder.matches(requestDto.password, article.get().password))
+                return ResultUtil.setCommonResult("E", "패스워드가 맞지 않습니다.", HttpStatus.UNAUTHORIZED)
 
             // DTO to Entity
-            article.convert(dto)
-            articleRepository.save(article)
-            ResultUtil.setCommonResult("S", "성공하였습니다.")
+            article.get().convert(requestDto);
+            articleRepository.save(article.get())
+
+            ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
         } else {
-            ResultUtil.setCommonResult("E", "데이터가 없습니다.")
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
         }
     }
+
+    @Transactional
+    override fun delete(seq: Long, requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
+
+        // 조회
+        val article = articleRepository.findById(seq)
+
+        return if (article.isPresent && article.get().useYn.equals("Y")) {
+
+            // 비밀번호 체크
+            if(!passwordEncoder.matches(requestDto.password, article.get().password))
+                return ResultUtil.setCommonResult("E", "패스워드가 맞지 않습니다.", HttpStatus.UNAUTHORIZED)
+
+            article.get().useYn = "N"
+            articleRepository.save(article.get())
+            ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
+        } else {
+            ResultUtil.setCommonResult("E", "데이터가 없습니다.", HttpStatus.OK)
+        }
+    }
+
 }
