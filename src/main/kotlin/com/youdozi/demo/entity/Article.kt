@@ -36,7 +36,11 @@ class Article(
 
         // 사용여부(Y, N)
         @Column(nullable = false, length = 1)
-        var useYn: String? = null
+        var useYn: String? = null,
+
+        // Batch 여부(Y, N)
+        @Column(nullable = false, length = 1)
+        var batchYn: String? = null
 
 ) : BaseEntity() {
 

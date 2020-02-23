@@ -53,7 +53,7 @@ class ArticleServiceImpl : ArticleService{
     @Transactional
     override fun save(requestDto: ArticleRequestDto): ResponseEntity<Map<String, Any>> {
 
-        articleRepository.save(Article(subject = requestDto.subject, content = requestDto.content, name = requestDto.name, password = passwordEncoder.encode(requestDto.password), useYn = "Y"));
+        articleRepository.save(Article(subject = requestDto.subject, content = requestDto.content, name = requestDto.name, password = passwordEncoder.encode(requestDto.password), useYn = "Y", batchYn = "N"));
 
         return ResultUtil.setCommonResult("S", "성공하였습니다.", HttpStatus.OK)
     }
