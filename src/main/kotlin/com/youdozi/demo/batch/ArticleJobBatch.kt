@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource
+import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.core.task.TaskExecutor
 import javax.persistence.EntityManagerFactory
-
-
 
 
 @Configuration
@@ -45,6 +45,11 @@ class ArticleJobBatch {
     private lateinit var entityManagerFactory: EntityManagerFactory
 
     @Bean
+    fun taskExecutor(): SimpleAsyncTaskExecutor {
+        return SimpleAsyncTaskExecutor("spring_batch")
+    }
+
+    @Bean
     fun articleJob(jobs: JobBuilderFactory): Job {
         return jobs.get("articleJob")
                    .start(articleBatch())
@@ -59,6 +64,7 @@ class ArticleJobBatch {
             .listener(articleItemReaderListener)
             .processor(articleItemProcessor)
             .writer(ArticleItemWriter(tempArticleRepository))
+            .taskExecutor(taskExecutor())
             .build()
     }
 }
