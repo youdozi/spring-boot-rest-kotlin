@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource
 import org.springframework.core.task.SimpleAsyncTaskExecutor
-import org.springframework.core.task.TaskExecutor
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import javax.persistence.EntityManagerFactory
 
 
@@ -45,8 +45,14 @@ class ArticleJobBatch {
     private lateinit var entityManagerFactory: EntityManagerFactory
 
     @Bean
-    fun taskExecutor(): SimpleAsyncTaskExecutor {
-        return SimpleAsyncTaskExecutor("spring_batch")
+    fun taskExecutor(): ThreadPoolTaskExecutor {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 12
+        executor.maxPoolSize = 24
+        executor.setQueueCapacity(500)
+        executor.setThreadNamePrefix("spring-batch")
+        executor.initialize()
+        return executor
     }
 
     @Bean
